@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deribit-price-service"
+version = "0.1.0"
+description = "FastAPI and Celery service for collecting index prices from Deribit."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp==3.12.15",
+    "celery==5.5.3",
+    "fastapi==0.116.1",
+    "psycopg[binary]==3.2.10",
+    "pydantic-settings==2.10.1",
+    "redis==6.4.0",
+    "sqlalchemy==2.0.43",
+    "uvicorn[standard]==0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx==0.28.1",
+    "pytest==8.4.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
