@@ -26,3 +26,27 @@ def test_save_price_persists_record(session) -> None:
     assert result.ticker == "ETH_USD"
     assert result.price == Decimal("2000.55000000")
     assert result.timestamp == 1700000000
+
+
+def test_get_latest_price_returns_most_recent_record(session) -> None:
+    service = PriceService(session)
+    service.save_price(
+        PriceSnapshotCreate(
+            ticker="BTC_USD",
+            price=Decimal("40000.12"),
+            timestamp=1700000000,
+        )
+    )
+    service.save_price(
+        PriceSnapshotCreate(
+            ticker="BTC_USD",
+            price=Decimal("41000.34"),
+            timestamp=1700000060,
+        )
+    )
+
+    latest = service.get_latest_price("BTC_USD")
+
+    assert latest is not None
+    assert latest.price == Decimal("41000.34000000")
+    assert latest.timestamp == 1700000060

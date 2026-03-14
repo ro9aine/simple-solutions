@@ -1,12 +1,14 @@
 from functools import lru_cache
+from typing import Annotated
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     app_host: str = Field(default="0.0.0.0", alias="APP_HOST")
     app_port: int = Field(default=8000, alias="APP_PORT")
+    log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/deribit",
         alias="DATABASE_URL",
@@ -20,7 +22,7 @@ class Settings(BaseSettings):
         default="https://www.deribit.com/api/v2",
         alias="DERIBIT_BASE_URL",
     )
-    default_tickers: list[str] = Field(
+    default_tickers: Annotated[list[str], NoDecode] = Field(
         default=["BTC_USD", "ETH_USD"],
         alias="DEFAULT_TICKERS",
     )

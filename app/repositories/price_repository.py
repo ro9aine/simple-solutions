@@ -21,7 +21,12 @@ class PriceRepository:
         return list(self._session.scalars(statement))
 
     def get_latest_by_ticker(self, ticker: str) -> PriceSnapshot | None:
-        statement = self._base_ticker_query(ticker).order_by(desc(PriceSnapshot.timestamp)).limit(1)
+        statement = (
+            self._base_ticker_query(ticker)
+            .order_by(None)
+            .order_by(desc(PriceSnapshot.timestamp))
+            .limit(1)
+        )
         return self._session.scalar(statement)
 
     def get_by_ticker_and_date_range(

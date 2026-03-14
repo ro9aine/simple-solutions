@@ -25,6 +25,9 @@ dev = [
     "pytest==8.4.1",
 ]
 
+[project.scripts]
+dev = "app.cli:dev"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 

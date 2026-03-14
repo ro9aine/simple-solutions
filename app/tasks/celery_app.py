@@ -1,14 +1,18 @@
 from celery import Celery
 
 from app.core.config import get_settings
+from app.core.logging import configure_logging, get_logger
 
 
 settings = get_settings()
+configure_logging(settings.log_level)
+logger = get_logger(__name__)
 
 celery_app = Celery(
     "deribit_price_service",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
+    include=["app.tasks.price_tasks"],
 )
 
 celery_app.conf.update(
@@ -21,4 +25,4 @@ celery_app.conf.update(
     },
 )
 
-celery_app.autodiscover_tasks(["app.tasks"])
+logger.info("Celery app configured with broker %s", settings.celery_broker_url)
