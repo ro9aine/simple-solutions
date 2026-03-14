@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import aiohttp
+from aiohttp import ClientTimeout
 
 
 class DeribitClient:
@@ -11,9 +12,10 @@ class DeribitClient:
         instrument = ticker.lower()
         url = f"{self._base_url}/public/get_index_price"
         params = {"index_name": instrument}
+        timeout = ClientTimeout(total=10)
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params, timeout=10) as response:
+            async with session.get(url, params=params, timeout=timeout) as response:
                 response.raise_for_status()
                 payload = await response.json()
 

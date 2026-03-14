@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
 
@@ -13,9 +14,9 @@ logger = get_logger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     logger.info("Initializing application database")
-    init_db()
+    await init_db()
     logger.info("Application startup complete")
     yield
     logger.info("Application shutdown complete")
@@ -31,5 +32,5 @@ app.include_router(prices_router)
 
 
 @app.get("/health")
-def healthcheck() -> dict[str, str]:
+async def healthcheck() -> dict[str, str]:
     return {"status": "ok"}

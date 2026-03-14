@@ -1,16 +1,33 @@
+from tests.conftest import run_async
+
 from decimal import Decimal
+
+from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.price import PriceSnapshotCreate
 from app.services.price_service import PriceService
 
 
 def seed_prices(service: PriceService) -> None:
-    service.save_price(PriceSnapshotCreate(ticker="BTC_USD", price=Decimal("40000.12"), timestamp=1700000000))
-    service.save_price(PriceSnapshotCreate(ticker="BTC_USD", price=Decimal("41000.34"), timestamp=1700000060))
-    service.save_price(PriceSnapshotCreate(ticker="ETH_USD", price=Decimal("2500.11"), timestamp=1700000120))
+    run_async(
+        service.save_price(
+            PriceSnapshotCreate(ticker="BTC_USD", price=Decimal("40000.12"), timestamp=1700000000)
+        )
+    )
+    run_async(
+        service.save_price(
+            PriceSnapshotCreate(ticker="BTC_USD", price=Decimal("41000.34"), timestamp=1700000060)
+        )
+    )
+    run_async(
+        service.save_price(
+            PriceSnapshotCreate(ticker="ETH_USD", price=Decimal("2500.11"), timestamp=1700000120)
+        )
+    )
 
 
-def test_get_all_prices(client, session) -> None:
+def test_get_all_prices(client: TestClient, session: AsyncSession) -> None:
     seed_prices(PriceService(session))
 
     response = client.get("/prices", params={"ticker": "BTC_USD"})
@@ -22,7 +39,7 @@ def test_get_all_prices(client, session) -> None:
     ]
 
 
-def test_get_latest_price(client, session) -> None:
+def test_get_latest_price(client: TestClient, session: AsyncSession) -> None:
     seed_prices(PriceService(session))
 
     response = client.get("/prices/latest", params={"ticker": "BTC_USD"})
@@ -35,7 +52,7 @@ def test_get_latest_price(client, session) -> None:
     }
 
 
-def test_get_prices_by_date(client, session) -> None:
+def test_get_prices_by_date(client: TestClient, session: AsyncSession) -> None:
     seed_prices(PriceService(session))
 
     response = client.get(
@@ -53,7 +70,7 @@ def test_get_prices_by_date(client, session) -> None:
     ]
 
 
-def test_get_prices_by_date_requires_range(client) -> None:
+def test_get_prices_by_date_requires_range(client: TestClient) -> None:
     response = client.get("/prices/by-date", params={"ticker": "BTC_USD"})
 
     assert response.status_code == 400

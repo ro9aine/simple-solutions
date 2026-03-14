@@ -18,13 +18,13 @@ async def _collect_prices() -> None:
     timestamp = int(time())
 
     logger.info("Starting price collection for %s tickers", len(settings.default_tickers))
-    init_db()
-    with SessionLocal() as session:
+    await init_db()
+    async with SessionLocal() as session:
         service = PriceService(session)
         for ticker in settings.default_tickers:
             try:
                 price = await client.get_index_price(ticker)
-                service.save_price(
+                await service.save_price(
                     PriceSnapshotCreate(
                         ticker=ticker,
                         price=price,

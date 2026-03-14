@@ -1,11 +1,13 @@
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 
 from fastapi import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db_session
 from app.services.price_service import PriceService
 
 
-def get_price_service(session: Session = Depends(get_db_session)) -> Generator[PriceService, None, None]:
+async def get_price_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> AsyncGenerator[PriceService, None]:
     yield PriceService(session)

@@ -9,19 +9,19 @@ router = APIRouter(prefix="/prices", tags=["prices"])
 
 
 @router.get("", response_model=list[PriceSnapshotRead])
-def get_prices(
+async def get_prices(
     ticker: str = Query(..., min_length=3, max_length=16),
     service: PriceService = Depends(get_price_service),
 ) -> list[PriceSnapshotRead]:
-    return service.get_prices(ticker)
+    return await service.get_prices(ticker)
 
 
 @router.get("/latest", response_model=PriceSnapshotRead)
-def get_latest_price(
+async def get_latest_price(
     ticker: str = Query(..., min_length=3, max_length=16),
     service: PriceService = Depends(get_price_service),
 ) -> PriceSnapshotRead:
-    latest = service.get_latest_price(ticker)
+    latest = await service.get_latest_price(ticker)
     if latest is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -31,7 +31,7 @@ def get_latest_price(
 
 
 @router.get("/by-date", response_model=list[PriceSnapshotRead])
-def get_prices_by_date(
+async def get_prices_by_date(
     ticker: str = Query(..., min_length=3, max_length=16),
     start_timestamp: int | None = Query(default=None, ge=0),
     end_timestamp: int | None = Query(default=None, ge=0),
@@ -53,4 +53,4 @@ def get_prices_by_date(
             detail="start_timestamp must be less than or equal to end_timestamp.",
         )
 
-    return service.get_prices_by_date(ticker, start_timestamp, end_timestamp)
+    return await service.get_prices_by_date(ticker, start_timestamp, end_timestamp)
